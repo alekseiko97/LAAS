@@ -1,10 +1,12 @@
 package com.alekseiko.laas.controller;
 
+import com.alekseiko.laas.OperationNotAllowedException;
 import com.alekseiko.laas.model.Contract;
 import com.alekseiko.laas.service.ContractService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -18,16 +20,27 @@ class ContractController {
         return contractService.getAllContractsList();
     }
 
-/*    @PostMapping
+    @PostMapping("/contracts")
     @ResponseStatus(HttpStatus.CREATED)
-    public Contract CreateLoanAmountApprovalRequest() {
-
-    }*/
-
-    @RequestMapping(value = "/statistics", method = RequestMethod.GET, produces = "application/json")
-    public void GetContractStatistics()
-    {
+    @ExceptionHandler
+    public void CreateLoanAmountRequest(@RequestBody Contract contract) {
+        try
+        {
+            contractService.AddLoanAmountRequest(contract);
+        }
+        catch (OperationNotAllowedException ex)
+        {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Operation not allowed", ex);
+        }
 
     }
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/contracts")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void ApproveLoanAmountRequest(@RequestParam(name = "customerID") String customerID, @RequestParam(name = "loanManager") String loanManager) {
+        contractService.ApproveContract(customerID, loanManager);
+    }
+
+
 
 }

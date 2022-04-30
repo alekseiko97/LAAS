@@ -1,32 +1,30 @@
 package com.alekseiko.laas.model;
 
-import java.util.List;
+import org.springframework.data.annotation.Id;
+
+import javax.persistence.GeneratedValue;
+import java.util.HashMap;
 
 public class Contract {
 
-    public Contract() {
-
-    }
-
-    public Contract(Integer id, String customerID, Double loanAmount, List<String> approvers) {
-        this.id = id;
+    public Contract(String customerID, Double loanAmount, HashMap<String, Boolean> approvers) {
         this.customerID = customerID;
         this.loanAmount = loanAmount;
-        this.pending = true;
         this.approvers = approvers;
+        this.pending = true;
     }
 
-    private Integer id;
+    private @Id @GeneratedValue Long id;
     private String customerID;
     private Double loanAmount;
     private Boolean pending;
-    private List<String> approvers;
+    private HashMap<String, Boolean> approvers;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -34,7 +32,7 @@ public class Contract {
         return pending;
     }
 
-    public void setPending() {
+    public void setPending(boolean pending) {
         this.pending = pending;
     }
 
@@ -42,7 +40,7 @@ public class Contract {
         return loanAmount;
     }
 
-    public void setLoanAmount() {
+    public void setLoanAmount(double loanAmount) {
         this.loanAmount = loanAmount;
     }
 
@@ -54,11 +52,8 @@ public class Contract {
         this.customerID = customerID;
     }
 
-    public List<String> getApprovers() {
+    public HashMap<String, Boolean> getApprovers() {
         return approvers;
     }
 
-    public void setApprovers(List<String> approvers) {
-        this.approvers = approvers;
-    }
 }
