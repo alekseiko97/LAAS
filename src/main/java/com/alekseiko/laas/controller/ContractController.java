@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -44,6 +45,10 @@ class ContractController {
         contractService.ApproveContract(customerID, loanManager);
     }
 
-
+    @GetMapping("/contracts/stats")
+    @ResponseStatus(HttpStatus.OK)
+    public HashMap<String, Double> GetContractsStatistics() {
+        return contractService.GetContractsStatistics();
+    }
 
 }

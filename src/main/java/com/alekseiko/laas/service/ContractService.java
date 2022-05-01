@@ -5,13 +5,13 @@ import com.alekseiko.laas.model.Contract;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
 @Service
 public class ContractService {
 
-    //private final HashMap<String, Boolean> loanManagers = new HashMap<>();
     private final List<String> loanManagers = new ArrayList<>();
 
     // dummy list
@@ -65,4 +65,32 @@ public class ContractService {
            contract.setPending(false); // approved
         }
     }
+
+    /*
+    * Return statistics of contracts that were sent to the customers during a period that is configured in the application (default is 60 seconds). Endpoint must return the following:
+     * count -  count of sent contracts
+     * sum - sum of all the loan amounts
+     * avg - average loan amount
+     * max - biggest loan amount
+     * min - smallest loan amount
+     * */
+    public HashMap<String, Double> GetContractsStatistics() {
+        HashMap<String, Double> map = new HashMap<>();
+
+        double count = contractList.size();
+
+        Double sum = contractList.stream().mapToDouble(Contract::getLoanAmount).sum();
+        Double avg = contractList.stream().mapToDouble(Contract::getLoanAmount).average().orElse(0);
+        Double min = contractList.stream().mapToDouble(Contract::getLoanAmount).min().orElse(0);
+        Double max = contractList.stream().mapToDouble(Contract::getLoanAmount).max().orElse(0);
+
+        map.put("count", count);
+        map.put("sum", sum);
+        map.put("avg", avg);
+        map.put("min", min);
+        map.put("max", max);
+
+        return map;
+    }
+
 }
