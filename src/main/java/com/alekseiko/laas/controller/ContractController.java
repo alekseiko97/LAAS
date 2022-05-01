@@ -32,6 +32,10 @@ class ContractController {
         {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Operation not allowed", ex);
         }
+        catch (IllegalArgumentException ex)
+        {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Illegal argument provided", ex);
+        }
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/contracts")

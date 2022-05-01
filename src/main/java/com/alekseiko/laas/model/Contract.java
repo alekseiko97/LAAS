@@ -2,33 +2,50 @@ package com.alekseiko.laas.model;
 
 import org.springframework.data.annotation.Id;
 
-import javax.persistence.GeneratedValue;
 import java.util.List;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Contract {
 
     public Contract(String customerID, Double loanAmount, List<String> approvers) {
-        // TODO: text, must be in a pattern XX-XXXX-XXX where X is either number or a letter
+
+        ValidateCustomerID(customerID);
+        ValidateApproversList(approvers);
+
+        this.id = UUID.randomUUID();
         this.customerID = customerID;
         this.loanAmount = loanAmount;
         this.approvers = approvers;
-        this.pending = true;
+        this.pending = true; // default
     }
 
-    private @Id
-    @GeneratedValue Long id;
+    @Id
+    private UUID id;
     private String customerID;
     private Double loanAmount;
     private Boolean pending;
-    //private HashMap<String, Boolean> approvers;
-    private List<String> approvers;
+    private final List<String> approvers;
 
-    public Long getId() {
-        return id;
+    private void ValidateCustomerID(String customerID) {
+        String expression = "^(\\w)(\\w)-(\\w)(\\w)(\\w)(\\w)-(\\w)(\\w)(\\w)$";
+        Pattern pattern = Pattern.compile(expression);
+
+        Matcher matcher = pattern.matcher(customerID);
+
+        if (!matcher.matches()) throw new IllegalArgumentException(String.format("Invalid format for customerID. Must be in a pattern XX-XXXX-XXX where X is either number or a letter, whereas provided %s", customerID));
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    private void ValidateApproversList(List<String> approvers) {
+        // list of usernames (text), up to 3
+        if (approvers.size() > 3) {
+            throw new IllegalArgumentException(String.format("Number of loan managers to approve loan request cannot exceed 3, provided %s", approvers.size()));
+        }
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public Boolean getPending() {
