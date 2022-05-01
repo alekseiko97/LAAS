@@ -3,22 +3,25 @@ package com.alekseiko.laas.model;
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.GeneratedValue;
-import java.util.HashMap;
+import java.util.List;
 
 public class Contract {
 
-    public Contract(String customerID, Double loanAmount, HashMap<String, Boolean> approvers) {
+    public Contract(String customerID, Double loanAmount, List<String> approvers) {
+        // TODO: text, must be in a pattern XX-XXXX-XXX where X is either number or a letter
         this.customerID = customerID;
         this.loanAmount = loanAmount;
         this.approvers = approvers;
         this.pending = true;
     }
 
-    private @Id @GeneratedValue Long id;
+    private @Id
+    @GeneratedValue Long id;
     private String customerID;
     private Double loanAmount;
     private Boolean pending;
-    private HashMap<String, Boolean> approvers;
+    //private HashMap<String, Boolean> approvers;
+    private List<String> approvers;
 
     public Long getId() {
         return id;
@@ -52,8 +55,7 @@ public class Contract {
         this.customerID = customerID;
     }
 
-    public HashMap<String, Boolean> getApprovers() {
+    public List<String> getApprovers() {
         return approvers;
     }
-
 }

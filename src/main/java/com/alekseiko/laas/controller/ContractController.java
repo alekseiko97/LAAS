@@ -32,7 +32,6 @@ class ContractController {
         {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Operation not allowed", ex);
         }
-
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/contracts")

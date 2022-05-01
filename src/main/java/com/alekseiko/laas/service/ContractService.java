@@ -2,38 +2,31 @@ package com.alekseiko.laas.service;
 
 import com.alekseiko.laas.OperationNotAllowedException;
 import com.alekseiko.laas.model.Contract;
-import com.alekseiko.laas.repository.ContractRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-
-// import org.springframework.data.jpa.repository.JpaRepository;
 
 @Service
 public class ContractService {
 
-    @Autowired
-    private ContractRepository contractRepository;
+    //private final HashMap<String, Boolean> loanManagers = new HashMap<>();
+    private final List<String> loanManagers = new ArrayList<>();
+
     // dummy list
-
-    private final HashMap<String, Boolean> loanManagers = new HashMap<>();
-
     private final List<Contract> contractList = new ArrayList<>(List.of(
             new Contract("XX-XXXX-XXX", 20.00, loanManagers) // dummy entry
     ));
 
     public ContractService() {
-        loanManagers.put("manager1", false); // false = not given approval yet (default value)
-        loanManagers.put("manager2", false);
-        loanManagers.put("manager3", false);
+        loanManagers.add("manager1");
+        loanManagers.add("manager2");
+        loanManagers.add("manager3");
     }
 
     public void AddLoanAmountRequest(Contract c) throws OperationNotAllowedException {
-        // TODO: There can be only one pending loan request for one customer
+        // There can be only one pending loan request for one customer
         for (var contract: contractList) {
             if (Objects.equals(contract.getCustomerID(), c.getCustomerID())) {
                 if (contract.getPending()) throw new OperationNotAllowedException(String.format("Pending loan request for customer %s already exists", c.getCustomerID()));
@@ -49,12 +42,27 @@ public class ContractService {
 
     public void ApproveContract(String customerID, String loanManager) {
 
-        // try to find loan contract by customerID, loan manager userName that needs to approve it, and pending status being true
-        getAllContractsList().stream().filter(x -> Objects.equals(x.getCustomerID(), customerID)
-                        && x.getPending() && x.getApprovers().containsKey(loanManager))
-                .findFirst().ifPresent(contract -> contract.getApprovers().put(loanManager, true));
+        // first, try to find a pending loan contract for a customer
+        var contractStream = getAllContractsList().stream().filter(x -> Objects.equals(x.getCustomerID(), customerID) && x.getPending());
 
-        // TODO: if contract is not found, return proper HTTP code with an error message
+        if (contractStream.findAny().isEmpty()) {
+            throw new NullPointerException(String.format("Couldn't find a pending loan contract for customer %s", customerID));
+        }
 
+        // then, try to find a loan manager that needs to approve this contract
+        contractStream = getAllContractsList().stream().filter(x -> Objects.equals(x.getCustomerID(), customerID) && x.getPending() && x.getApprovers().contains(loanManager));
+        var contract = contractStream.findFirst().orElse(null);
+
+        if (contract == null) {
+            throw new NullPointerException(String.format("%s is not assigned to approve a loan contract for %s", loanManager, customerID));
+        }
+
+        // TODO: reconsider
+        contract.getApprovers().remove(loanManager);
+
+        if (contract.getApprovers().size() == 0) {
+           // After the specified managers have added their approvals the contract will be automatically sent to the customer.
+           contract.setPending(false); // approved
+        }
     }
 }
