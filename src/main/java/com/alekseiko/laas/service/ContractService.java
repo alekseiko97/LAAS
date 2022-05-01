@@ -75,6 +75,8 @@ public class ContractService {
      * min - smallest loan amount
      * */
     public HashMap<String, Double> GetContractsStatistics() {
+        // TODO: period that is configured in the application (default is 60 seconds)
+
         HashMap<String, Double> map = new HashMap<>();
 
         double count = contractList.size();
